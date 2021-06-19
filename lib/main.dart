@@ -115,8 +115,8 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Widget _buildLandscapeContent() {
-    return Row(
+  List<Widget> _buildLandscapeContent(MediaQueryData mediaQuery, AppBar appBar, Widget txtListWidget) {
+    return [Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Text(
@@ -132,17 +132,25 @@ class _MyHomePageState extends State<MyHomePage> {
               });
             }),
       ],
-    );
+    ), _showChart
+                  ? Container(
+                      height: (mediaQuery.size.height -
+                              appBar.preferredSize.height -
+                              mediaQuery.padding.top) *
+                          0.7,
+                      child: Chart(_recentTransactions),
+                    )
+                  : txtListWidget ];
   }
 
-  Widget _buildPortraitContent(MediaQueryData mediaQuery, AppBar appBar) {
-    return Container(
+  List<Widget> _buildPortraitContent(MediaQueryData mediaQuery, AppBar appBar, Widget txtListWidget) {
+    return [Container(
       height: (mediaQuery.size.height -
               appBar.preferredSize.height -
               mediaQuery.padding.top) *
           0.3,
       child: Chart(_recentTransactions),
-    );
+    ), txtListWidget];
   }
 
   @override
@@ -188,19 +196,8 @@ class _MyHomePageState extends State<MyHomePage> {
           // mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            if (isLandscape) _buildLandscapeContent(),
-            if (!isLandscape) _buildPortraitContent(mediaQuery, appBar),
-            if (!isLandscape) txtListWidget,
-            if (isLandscape)
-              _showChart
-                  ? Container(
-                      height: (MediaQuery.of(context).size.height -
-                              appBar.preferredSize.height -
-                              MediaQuery.of(context).padding.top) *
-                          0.7,
-                      child: Chart(_recentTransactions),
-                    )
-                  : txtListWidget
+            if (isLandscape) ..._buildLandscapeContent(mediaQuery, appBar, txtListWidget),
+            if (!isLandscape) ..._buildPortraitContent(mediaQuery, appBar, txtListWidget),  
           ],
         ),
       ),
